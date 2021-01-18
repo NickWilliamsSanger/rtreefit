@@ -1,0 +1,37 @@
+Package: rtreefit
+Title: Package For Estimating Branch Timings
+Version: 1.0.0
+Authors@R: 
+    person(given = "Nicholas",
+           family = "Williams",
+           role = c("aut", "cre"),
+           email = "nw14@sanger.ac.uk",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: Estimates branch lengths using observed mutation burden and per branch sensitivities. Constrained so that the root to tip distance is the specified age at sampling of the tips.
+License: GPL3
+Encoding: UTF-8
+LazyData: true
+Biarch: true
+Depends: 
+    R (>= 3.4.0),
+    ape,
+    rsimpop
+Imports: 
+    methods,
+    Rcpp (>= 0.12.0),
+    rstan (>= 2.18.1),
+    rstantools (>= 2.0.0),
+    phytools
+LinkingTo: 
+    BH (>= 1.66.0),
+    Rcpp (>= 0.12.0),
+    RcppEigen (>= 0.3.3.3.0),
+    rstan (>= 2.18.1),
+    StanHeaders (>= 2.18.0)
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder:
+    knitr
+SystemRequirements: GNU make
+RoxygenNote: 7.1.1
