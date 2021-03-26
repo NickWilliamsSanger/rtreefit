@@ -1,4 +1,4 @@
-18/01/2021
+26/03/2021
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -105,7 +105,7 @@ testing=run_neutral_sim(0.1,1/365,nyears=5)
 #> n_sim_days: 1825
 #> b_stop_if_empty: 0
 #> b_stop_at_pop_size: 0
-#> maxt: 105.800574720087
+#> maxt: 101.552598401644
 #> driver_rate_per_cell_per_day: 0
 #> MAX_EVENTS= 3650 
 #> MAX_SIZE= 300003
@@ -131,19 +131,23 @@ plot_tree(st)
     res=fit_tree(tree=st,switch_nodes = c(),xcross = c(),niter = 10000,model = "poisson_tree",early_growth_model_on = 0.0)
     #> Warning in fit_tree(tree = st, switch_nodes = c(), xcross = c(), niter =
     #> 10000, : No sensitivity supplied: assuming 99%
-    #> Median lambda estimate=24.85
+    #> Median lambda estimate=25.05
+    #> Error in new_CppObject_xp(fields$.module, fields$.pointer, ...) : 
+    #>   Exception: variable does not exist; processing stage=data initialization; variable name=alpha; base type=vector_d  (in 'model_poisson_tree' at line 106)
+    #> failed to create the sampler; sampling not done
+    #> Stan model 'poisson_tree' does not contain samples.
     print(res$lambda)
     #> $mean
-    #> [1] 25.00386
+    #> NULL
     #> 
     #> $sd
-    #> [1] 0.4765364
+    #> NULL
     #> 
     #> $lb
-    #> [1] 24.11104
+    #> NULL
     #> 
     #> $ub
-    #> [1] 25.97541
+    #> NULL
     #> 
     #> $median
-    #> [1] 24.98686
+    #> NULL
