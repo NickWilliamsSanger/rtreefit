@@ -149,6 +149,7 @@ res=fit_tree(tree=st,switch_nodes = node,xcross = c(),niter = 10000,model = "poi
 print(res$lambda)
 ut=get_elapsed_time_tree(st)
 ut$edge.length=ut$edge.length/365
+par(mfcol=c(1,2))
 plot_tree(ut,cex.label = 0);title("True Ultrametric Tree")
 plot_tree(res$ultratree,cex.label = 0);title("Inferred Tree")
 ```

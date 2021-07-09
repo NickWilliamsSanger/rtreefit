@@ -52,7 +52,7 @@ Where we are using a per-branch estimated sensitivity *s*<sub>*i*</sub> that ind
 
 *m*<sub>*i*</sub> ∼ NB(*λ**t*<sub>*i*</sub>*s*<sub>*i*</sub>, *λ**t*<sub>*i*</sub>*ϕ*)
 
-with priors $\\frac{1}{\\phi} \\sim \\text{HalfNormal}(0,10)$, $\\lambda \\sim \\mathcal{N}(\\hat{\\lambda},0.25 \\hat{\\lambda}$ where $\\hat{\\lambda}$ is the naive estimation of a single rate *λ* as the per patient median of the ratio of the root to tip mutation count and the tip sampling age, and finally we use the weakly informative prior for the stick breaking fractions:
+with priors $\\frac{1}{\\phi} \\sim \\text{HalfNormal}(0,10)$, $\\lambda \\sim \\mathcal{N}(\\hat{\\lambda},0.25 \\hat{\\lambda})$ where $\\hat{\\lambda}$ is the naive estimation of a single rate *λ* as the per patient median of the ratio of the root to tip mutation count and the tip sampling age, and finally we use the weakly informative prior for the stick breaking fractions:
 $$x\_i \\sim \\text{Beta}(\\alpha=\\frac{p\_i}{1-\\sum\_{j\\in A(i)}p\_j},\\beta=1)$$
  where the *p*<sub>*i*</sub> is an initial approximation of the duration of the branch length expressed as a fraction of the sampling time:
 $$p\_i=\\text{min}\_{j\\in D(i)}\\left\\{\\frac{m\_j+1}{\\sum\_{k\\in A(j)}\\left(m\_k+1\\right)}\\right\\}$$
@@ -112,7 +112,7 @@ testing=run_neutral_sim(0.1,1/365,nyears=NYEARS)
 #> n_sim_days: 9125
 #> b_stop_if_empty: 0
 #> b_stop_at_pop_size: 0
-#> maxt: 108.875336391865
+#> maxt: 133.186269064628
 #> driver_rate_per_cell_per_day: 0
 #> MAX_EVENTS= 18250 
 #> MAX_SIZE= 300003
@@ -139,22 +139,22 @@ plot_tree(st)
     res=fit_tree(tree=st,switch_nodes = c(),xcross = c(),niter = 10000,model = "poisson_tree",early_growth_model_on = 0.0)
     #> Warning in fit_tree(tree = st, switch_nodes = c(), xcross = c(), niter =
     #> 10000, : No sensitivity supplied: assuming 99%
-    #> Median lambda estimate=17.94
+    #> Median lambda estimate=18.30
     print(res$lambda)
     #> $mean
-    #> [1] 18.04076
+    #> [1] 18.37559
     #> 
     #> $sd
-    #> [1] 0.1682338
+    #> [1] 0.1715528
     #> 
     #> $lb
-    #> [1] 17.71678
+    #> [1] 18.04111
     #> 
     #> $ub
-    #> [1] 18.3696
+    #> [1] 18.72024
     #> 
     #> $median
-    #> [1] 18.03967
+    #> [1] 18.37409
     par(mfcol=c(1,2))
     ut=get_elapsed_time_tree(st)
     ut$edge.length=ut$edge.length/365
@@ -194,103 +194,19 @@ selsim=run_selection_sim(0.1,1/365,target_pop_size = 1e5,nyears_driver_acquisiti
 #> n_sim_days: 1825
 #> b_stop_if_empty: 0
 #> b_stop_at_pop_size: 0
-#> maxt: 113.216568512356
+#> maxt: 109.958137588241
 #> driver_rate_per_cell_per_day: 0
 #> MAX_EVENTS= 3650 
 #> MAX_SIZE= 300003 
 #> No driver found: tries= 0 
 #>    val population fitness id driver1
 #> 1    0          1     0.0  0       0
-#> 2    1      99954     0.0  0       0
+#> 2    1      99976     0.0  0       0
 #> 21   1          1     0.3  1       1
 #> n_sim_days: 14600
 #> b_stop_if_empty: 1
 #> b_stop_at_pop_size: 0
-#> maxt: 1825.00300661177
-#> driver_rate_per_cell_per_day: 0
-#> MAX_EVENTS= 29200 
-#> MAX_SIZE= 300003 
-#> No driver found: tries= 1 
-#>    val population fitness id driver1
-#> 1    0          1     0.0  0       0
-#> 2    1      99954     0.0  0       0
-#> 21   1          1     0.3  1       1
-#> n_sim_days: 14600
-#> b_stop_if_empty: 1
-#> b_stop_at_pop_size: 0
-#> maxt: 1825.00300661177
-#> driver_rate_per_cell_per_day: 0
-#> MAX_EVENTS= 29200 
-#> MAX_SIZE= 300003 
-#> No driver found: tries= 2 
-#>    val population fitness id driver1
-#> 1    0          1     0.0  0       0
-#> 2    1      99954     0.0  0       0
-#> 21   1          1     0.3  1       1
-#> n_sim_days: 14600
-#> b_stop_if_empty: 1
-#> b_stop_at_pop_size: 0
-#> maxt: 1825.00300661177
-#> driver_rate_per_cell_per_day: 0
-#> MAX_EVENTS= 29200 
-#> MAX_SIZE= 300003 
-#> No driver found: tries= 3 
-#>    val population fitness id driver1
-#> 1    0          1     0.0  0       0
-#> 2    1      99954     0.0  0       0
-#> 21   1          1     0.3  1       1
-#> n_sim_days: 14600
-#> b_stop_if_empty: 1
-#> b_stop_at_pop_size: 0
-#> maxt: 1825.00300661177
-#> driver_rate_per_cell_per_day: 0
-#> MAX_EVENTS= 29200 
-#> MAX_SIZE= 300003 
-#> No driver found: tries= 4 
-#>    val population fitness id driver1
-#> 1    0          1     0.0  0       0
-#> 2    1      99954     0.0  0       0
-#> 21   1          1     0.3  1       1
-#> n_sim_days: 14600
-#> b_stop_if_empty: 1
-#> b_stop_at_pop_size: 0
-#> maxt: 1825.00300661177
-#> driver_rate_per_cell_per_day: 0
-#> MAX_EVENTS= 29200 
-#> MAX_SIZE= 300003 
-#> No driver found: tries= 5 
-#>    val population fitness id driver1
-#> 1    0          1     0.0  0       0
-#> 2    1      99954     0.0  0       0
-#> 21   1          1     0.3  1       1
-#> n_sim_days: 14600
-#> b_stop_if_empty: 1
-#> b_stop_at_pop_size: 0
-#> maxt: 1825.00300661177
-#> driver_rate_per_cell_per_day: 0
-#> MAX_EVENTS= 29200 
-#> MAX_SIZE= 300003 
-#> No driver found: tries= 6 
-#>    val population fitness id driver1
-#> 1    0          1     0.0  0       0
-#> 2    1      99954     0.0  0       0
-#> 21   1          1     0.3  1       1
-#> n_sim_days: 14600
-#> b_stop_if_empty: 1
-#> b_stop_at_pop_size: 0
-#> maxt: 1825.00300661177
-#> driver_rate_per_cell_per_day: 0
-#> MAX_EVENTS= 29200 
-#> MAX_SIZE= 300003 
-#> No driver found: tries= 7 
-#>    val population fitness id driver1
-#> 1    0          1     0.0  0       0
-#> 2    1      99954     0.0  0       0
-#> 21   1          1     0.3  1       1
-#> n_sim_days: 14600
-#> b_stop_if_empty: 1
-#> b_stop_at_pop_size: 0
-#> maxt: 1825.00300661177
+#> maxt: 1825.00193260129
 #> driver_rate_per_cell_per_day: 0
 #> MAX_EVENTS= 29200 
 #> MAX_SIZE= 300003
@@ -305,29 +221,30 @@ node=st$events$node[which(st$events$driverid==1)]
 res=fit_tree(tree=st,switch_nodes = node,xcross = c(),niter = 10000,model = "poisson_tree",early_growth_model_on = 0.0)
 #> Warning in fit_tree(tree = st, switch_nodes = node, xcross = c(), niter =
 #> 10000, : No sensitivity supplied: assuming 99%
-#> Median lambda estimate=15.20
+#> Median lambda estimate=15.10
 print(res$lambda)
 #> $mean
 #> lambda[1] lambda[2] 
-#>  15.05286  15.67520 
+#>  15.23813  15.04098 
 #> 
 #> $sd
 #> lambda[1] lambda[2] 
-#> 0.1306224 0.5213855 
+#> 0.1374329 0.4578260 
 #> 
 #> $lb
 #> lambda[1] lambda[2] 
-#>  14.79680  14.69335 
+#>  14.97016  14.17920 
 #> 
 #> $ub
 #> lambda[1] lambda[2] 
-#>  15.30864  16.76342 
+#>  15.50640  15.95628 
 #> 
 #> $median
 #> lambda[1] lambda[2] 
-#>  15.05287  15.65733
+#>  15.23717  15.02817
 ut=get_elapsed_time_tree(st)
 ut$edge.length=ut$edge.length/365
+par(mfcol=c(1,2))
 plot_tree(ut,cex.label = 0);title("True Ultrametric Tree")
 #> 
 #> Phylogenetic tree with 31 tips and 30 internal nodes.
@@ -336,11 +253,6 @@ plot_tree(ut,cex.label = 0);title("True Ultrametric Tree")
 #>  s1, s2, s3, s4, s5, s6, ...
 #> 
 #> Rooted; includes branch lengths.
-```
-
-<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
-
-``` r
 plot_tree(res$ultratree,cex.label = 0);title("Inferred Tree")
 #> 
 #> Phylogenetic tree with 31 tips and 30 internal nodes.
@@ -351,4 +263,4 @@ plot_tree(res$ultratree,cex.label = 0);title("Inferred Tree")
 #> Rooted; includes branch lengths.
 ```
 
-<img src="man/figures/README-unnamed-chunk-3-2.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
