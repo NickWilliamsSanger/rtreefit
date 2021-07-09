@@ -2,29 +2,41 @@
 % Please edit documentation in R/rtreefit.R
 \name{fit_tree}
 \alias{fit_tree}
-\title{Fit tree to infer branch timings based on observed mutation count and sensitivity}
+\title{Fit tree to infer branch timings and mutation rate based on observed mutation count and sensitivity}
 \usage{
 fit_tree(
   tree,
   switch_nodes,
-  xcross,
+  xcross = NA,
   b_pool_rates = FALSE,
-  type = "local",
   niter = 20000,
-  suffix = "",
   cores = 3,
   split_nodes = switch_nodes,
-  model = "nb_tree"
+  model = "nb_tree",
+  early_growth_model_on = 1,
+  stan_control = list(adapt_delta = 0.95)
 )
 }
 \arguments{
 \item{tree}{Augmented ape phylo object. A list that should contain agedf - a dataframe with tip.label and age specifying the terminal timepoint for each tip.}
 
 \item{switch_nodes}{Nodes where a change rate occurs}
+
+\item{xcross}{Currently ignored.  Method assumes uniform prior for location of switch event on branch.  Plan to reintroduce this to fix distance.}
+
+\item{b_pool_rates}{Boolean. Whether to pool the mutant clades specified by switch_nodes and estimate as single mutant mutation rate}
+
+\item{niter}{Number of iterations per chain in stan inference}
+
+\item{model}{nb_tree or poisson_tree}
+
+\item{early_growth_model_on}{Numeric. Scaling for early growth model.  If 0 then the model is switched off.}
+
+\item{stan_control}{List. Control list to be passed into rstan::sampling.}
 }
 \value{
 A list
 }
 \description{
-Fit tree to infer branch timings based on observed mutation count and sensitivity
+Fit tree to infer branch timings and mutation rate based on observed mutation count and sensitivity
 }

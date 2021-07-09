@@ -62,7 +62,7 @@ We assume that there are $p-1$ change points in the tree corresponding to the ac
 
 We assume the underlying mutation process follows a Negative Binomial Distribution with the above piecewise constant driver specific mutation rates, the number of mutations accrued on branch $i$ in time $t_i$ measured in years:
 
-\[ M_i \sim \text{NB}(\lambda t_i,\lambda t_i \phi)\]
+\[ M_i \sim \text{NB}(\lambda t_i,\lambda t_i \phi) \]
 
 The number of observed mutations is:
 
@@ -103,20 +103,54 @@ where
 
 Where we have chosen the concentration parameter $c=100$. This reflects only modest uncertainty in our estimates in sensitivity and also allows the model to mitigate larger than expected variability in the branch lengths. In other respects the priors are the same as for the Negative Binomial Model.
 
-```{r}
-x=seq(0.5,0.99,0.01)
-plot(x,sqrt(sapply(x,function(x) {a=100;b=100*(1-x)/x;a*b/(((a+b)**2)*(a+b+1))})),xlab="Estimated Sensitivity",ylab="Std. Dev.",ylim=c(0,0.05),type="l",main="Standard Deviation of Sensitivity Prior vs Estimated Sensitivity",cex.main=0.8)
-```
 
-Examples.  First lets simulate a tree using rsimpop.
+### Examples
+
+
+## Neutral Case.  One Rate
+First lets simulate a neutral tree using rsimpop and fit the tree..
 
 ```{r}
 library("rtreefit")## Loads rsimpop as well
-testing=run_neutral_sim(0.1,1/365,nyears=5)
+NYEARS=25
+RATE=18
+get_agedf_from_sim=function(simtree){
+  st=get_elapsed_time_tree(simtree)## Gets "Real Time" ultrametric tree
+  nh=nodeHeights(st)
+  out=data.frame(tip.label=st$tip.label,age=nh[match(1:length(st$tip.label),st$edge[,2]),2]/365)
+  out$age=ifelse(out$age<1e-6,1e-6,out$age)
+  out
+}
+testing=run_neutral_sim(0.1,1/365,nyears=NYEARS)
 st=get_subsampled_tree(testing,30)
-st=get_elapsed_time_tree(st,mutrateperdivision = 0,backgroundrate = 25/365,odf=1)
+st=get_elapsed_time_tree(st,mutrateperdivision = 0,backgroundrate = RATE/365,odf=1)
+
 plot_tree(st)
-st$agedf=data.frame(tip.label=sprintf("s%d",1:31),age=c(1e-6,rep(5,30)))
+st$agedf=get_agedf_from_sim(st)
 res=fit_tree(tree=st,switch_nodes = c(),xcross = c(),niter = 10000,model = "poisson_tree",early_growth_model_on = 0.0)
 print(res$lambda)
+par(mfcol=c(1,2))
+ut=get_elapsed_time_tree(st)
+ut$edge.length=ut$edge.length/365
+plot_tree(ut,cex.label = 0);title("True Ultrametric Tree")
+plot_tree(res$ultratree,cex.label = 0);title("Inferred Tree")
 ```
+
+## Selection Case. Two fitted rates - both the same..
+```{r}
+NYEARS=40
+RATE=15
+selsim=run_selection_sim(0.1,1/365,target_pop_size = 1e5,nyears_driver_acquisition = 5,nyears = NYEARS,fitness=0.3,minprop = 0.05)
+st=get_subsampled_tree(selsim,30)
+st=get_elapsed_time_tree(st,mutrateperdivision = 0,backgroundrate = RATE/365,odf=1)
+st$agedf=get_agedf_from_sim(st)
+node=st$events$node[which(st$events$driverid==1)]
+res=fit_tree(tree=st,switch_nodes = node,xcross = c(),niter = 10000,model = "poisson_tree",early_growth_model_on = 0.0)
+print(res$lambda)
+ut=get_elapsed_time_tree(st)
+ut$edge.length=ut$edge.length/365
+plot_tree(ut,cex.label = 0);title("True Ultrametric Tree")
+plot_tree(res$ultratree,cex.label = 0);title("Inferred Tree")
+```
+
+

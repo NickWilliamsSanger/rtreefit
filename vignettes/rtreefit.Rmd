@@ -90,7 +90,9 @@ x=seq(0.5,0.99,0.01)
 plot(x,sqrt(sapply(x,function(x) {a=100;b=100*(1-x)/x;a*b/(((a+b)**2)*(a+b+1))})),xlab="Estimated Sensitivity",ylab="Std. Dev.",ylim=c(0,0.05),type="l",main="Standard Deviation of Sensitivity Prior vs Estimated Sensitivity",cex.main=0.8)
 ```
 
-Examples.  First lets simulate a tree using rsimpop.
+## Examples  
+
+First lets simulate a tree using rsimpop:
 
 ```{r}
 library("rsimpop")
@@ -98,9 +100,30 @@ testing=run_neutral_sim(0.1,1/365,nyears=5)
 st=get_subsampled_tree(testing,30)
 st=get_elapsed_time_tree(st,mutrateperdivision = 0,backgroundrate = 25/365,odf=1)
 plot_tree(st)
+```
+
+We need to associate an "age" with each sampled tip:
+
+```{r}
 st$agedf=data.frame(tip.label=sprintf("s%d",1:31),age=c(1e-6,rep(5,30)))
+```
+
+We then fit a model with the early growth switched model switched off
+```{r}
 res=fit_tree(tree=st,switch_nodes = c(),xcross = c(),niter = 10000,model = "poisson_tree",early_growth_model_on = 0.0)
 print(res$lambda)
-
 ```
+
+This also gives us an ultrametric tree
+```{r}
+par(mfcol=c(1,2))
+ttree=get_elapsed_time_tree(st)
+ttree$edge.length=ttree$edge.length/365
+plot_tree(get_elapsed_time_tree(st),cex.label=0.5);title("True Real Time Tree")
+plot_tree(res$ultratree,cex.label=0.5);title("Inferred Real Time Tree")
+```
+
+
+
+
 

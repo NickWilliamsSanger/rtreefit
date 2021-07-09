@@ -1,23 +1,29 @@
 require("phytools")
 require("rstan")
-#' Fit tree to infer branch timings based on observed mutation count and sensitivity
+#' Fit tree to infer branch timings and mutation rate based on observed mutation count and sensitivity
 #'
 #' @export
 #' @param tree Augmented ape phylo object. A list that should contain agedf - a dataframe with tip.label and age specifying the terminal timepoint for each tip.
 #' @param switch_nodes Nodes where a change rate occurs
+#' @param xcross  Currently ignored.  Method assumes uniform prior for location of switch event on branch.  Plan to reintroduce this to fix distance.
+#' @param b_pool_rates Boolean. Whether to pool the mutant clades specified by switch_nodes and estimate as single mutant mutation rate
+#' @param niter  Number of iterations per chain in stan inference
+#' @param model nb_tree or poisson_tree
+#' @param early_growth_model_on  Numeric. Scaling for early growth model.  If 0 then the model is switched off.
+#' @param stan_control  List. Control list to be passed into rstan::sampling.
 #' @return A list
 #'
 fit_tree=function(tree,
                   switch_nodes,
-                  xcross,
+                  xcross=NA,
                   b_pool_rates=FALSE,
-                  type="local",
                   niter=20000,
-                  suffix="",
                   cores=3,
                   split_nodes=switch_nodes,
                   model="nb_tree",
-                  early_growth_model_on=1.0){
+                  early_growth_model_on=1.0,
+                  stan_control=list(adapt_delta=0.95)
+                  ){
   if(is.null(tree$sensitivity)){
     warning("No sensitivity supplied: assuming 99%")
     tree$sensitivity=rep(0.99,length(tree$edge.length))
@@ -26,7 +32,17 @@ fit_tree=function(tree,
     stop("Please supply dataframe: agedf")
   }
   pt=list(tree=tree,agedf=tree$agedf,switch_node=switch_nodes,xcross=xcross)
-  fitres=nbfit_tree_stan_mcmc(tree = pt$tree,agedf = pt$agedf,rate_switch_nodes = pt$switch_node, xcross=pt$xcross,niter = niter,b_pool_rates = b_pool_rates,cores=cores,split_nodes = split_nodes,model = model,early_growth_model_on=early_growth_model_on)
+  fitres=nbfit_tree_stan_mcmc(tree = pt$tree,
+                              agedf = pt$agedf,
+                              rate_switch_nodes = pt$switch_node,
+                              xcross=pt$xcross,
+                              niter = niter,
+                              b_pool_rates = b_pool_rates,
+                              cores=cores,
+                              split_nodes = split_nodes,
+                              model = model,
+                              early_growth_model_on=early_growth_model_on,
+                              stan_control = stan_control)
 
   fitres$agedf=pt$agedf
   fitres
@@ -43,7 +59,8 @@ nbfit_tree_stan_mcmc=function(tree,
          odf=-1,
          split_nodes=rate_switch_nodes,
          concentration=1,
-         early_growth_model_on=1.0
+         early_growth_model_on=1.0,
+         stan_control=list(adapt_delta=0.95)
 ){
   if(b_debug){
     browser()
@@ -52,7 +69,7 @@ nbfit_tree_stan_mcmc=function(tree,
   dat$early_growth_model_on=early_growth_model_on
   dat$concentration=rep(concentration,dat$NINT)
   dat$q=dat$q[dat$xidx>0]
-  stanr=rstan::sampling(stanmodels[[model]], data=dat,chains = cores,iter=niter,cores=cores,control=list(adapt_delta=0.95))
+  stanr=rstan::sampling(stanmodels[[model]], data=dat,chains = cores,iter=niter,cores=cores,control=stan_control)
   if(length(split_nodes)>0){
     post.dist=rstan::extract(stanr)
     idx.rate.switch=match(split_nodes,tree$edge[,2])

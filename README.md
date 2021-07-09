@@ -1,4 +1,4 @@
-26/03/2021
+09/07/2021
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -83,18 +83,107 @@ $$ S\_i \\sim \\text{Beta}(\\alpha=c,\\beta=c\\frac{1-s\_i}{s\_i})$$
 
 Where we have chosen the concentration parameter *c* = 100. This reflects only modest uncertainty in our estimates in sensitivity and also allows the model to mitigate larger than expected variability in the branch lengths. In other respects the priors are the same as for the Negative Binomial Model.
 
+### Examples
+
+Neutral Case. One Rate
+----------------------
+
+First lets simulate a neutral tree using rsimpop and fit the tree..
+
 ``` r
-x=seq(0.5,0.99,0.01)
-plot(x,sqrt(sapply(x,function(x) {a=100;b=100*(1-x)/x;a*b/(((a+b)**2)*(a+b+1))})),xlab="Estimated Sensitivity",ylab="Std. Dev.",ylim=c(0,0.05),type="l",main="Standard Deviation of Sensitivity Prior vs Estimated Sensitivity",cex.main=0.8)
+library("rtreefit")## Loads rsimpop as well
+NYEARS=25
+RATE=18
+get_agedf_from_sim=function(simtree){
+  st=get_elapsed_time_tree(simtree)## Gets "Real Time" ultrametric tree
+  nh=nodeHeights(st)
+  out=data.frame(tip.label=st$tip.label,age=nh[match(1:length(st$tip.label),st$edge[,2]),2]/365)
+  out$age=ifelse(out$age<1e-6,1e-6,out$age)
+  out
+}
+testing=run_neutral_sim(0.1,1/365,nyears=NYEARS)
+#> n_sim_days: 9125
+#> b_stop_if_empty: 0
+#> b_stop_at_pop_size: 1
+#> maxt: 0
+#> driver_rate_per_cell_per_day: 0
+#> MAX_EVENTS= 18250 
+#> MAX_SIZE= 300003 
+#> n_sim_days: 9125
+#> b_stop_if_empty: 0
+#> b_stop_at_pop_size: 0
+#> maxt: 108.875336391865
+#> driver_rate_per_cell_per_day: 0
+#> MAX_EVENTS= 18250 
+#> MAX_SIZE= 300003
+st=get_subsampled_tree(testing,30)
+#> Starting checking the validity of tmp...
+#> Found number of tips: n = 31 
+#> Found number of nodes: m = 30 
+#> Done.
+st=get_elapsed_time_tree(st,mutrateperdivision = 0,backgroundrate = RATE/365,odf=1)
+
+plot_tree(st)
 ```
 
 <img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
 
-Examples. First lets simulate a tree using rsimpop.
+    #> 
+    #> Phylogenetic tree with 31 tips and 30 internal nodes.
+    #> 
+    #> Tip labels:
+    #>  s1, s2, s3, s4, s5, s6, ...
+    #> 
+    #> Rooted; includes branch lengths.
+    st$agedf=get_agedf_from_sim(st)
+    res=fit_tree(tree=st,switch_nodes = c(),xcross = c(),niter = 10000,model = "poisson_tree",early_growth_model_on = 0.0)
+    #> Warning in fit_tree(tree = st, switch_nodes = c(), xcross = c(), niter =
+    #> 10000, : No sensitivity supplied: assuming 99%
+    #> Median lambda estimate=17.94
+    print(res$lambda)
+    #> $mean
+    #> [1] 18.04076
+    #> 
+    #> $sd
+    #> [1] 0.1682338
+    #> 
+    #> $lb
+    #> [1] 17.71678
+    #> 
+    #> $ub
+    #> [1] 18.3696
+    #> 
+    #> $median
+    #> [1] 18.03967
+    par(mfcol=c(1,2))
+    ut=get_elapsed_time_tree(st)
+    ut$edge.length=ut$edge.length/365
+    plot_tree(ut,cex.label = 0);title("True Ultrametric Tree")
+    #> 
+    #> Phylogenetic tree with 31 tips and 30 internal nodes.
+    #> 
+    #> Tip labels:
+    #>  s1, s2, s3, s4, s5, s6, ...
+    #> 
+    #> Rooted; includes branch lengths.
+    plot_tree(res$ultratree,cex.label = 0);title("Inferred Tree")
+    #> 
+    #> Phylogenetic tree with 31 tips and 30 internal nodes.
+    #> 
+    #> Tip labels:
+    #>  s1, s2, s3, s4, s5, s6, ...
+    #> 
+    #> Rooted; includes branch lengths.
+
+<img src="man/figures/README-unnamed-chunk-2-2.png" width="100%" />
+
+Selection Case. Two fitted rates - both the same..
+--------------------------------------------------
 
 ``` r
-library("rtreefit")## Loads rsimpop as well
-testing=run_neutral_sim(0.1,1/365,nyears=5)
+NYEARS=40
+RATE=15
+selsim=run_selection_sim(0.1,1/365,target_pop_size = 1e5,nyears_driver_acquisition = 5,nyears = NYEARS,fitness=0.3,minprop = 0.05)
 #> n_sim_days: 1825
 #> b_stop_if_empty: 0
 #> b_stop_at_pop_size: 1
@@ -105,49 +194,161 @@ testing=run_neutral_sim(0.1,1/365,nyears=5)
 #> n_sim_days: 1825
 #> b_stop_if_empty: 0
 #> b_stop_at_pop_size: 0
-#> maxt: 101.552598401644
+#> maxt: 113.216568512356
 #> driver_rate_per_cell_per_day: 0
 #> MAX_EVENTS= 3650 
+#> MAX_SIZE= 300003 
+#> No driver found: tries= 0 
+#>    val population fitness id driver1
+#> 1    0          1     0.0  0       0
+#> 2    1      99954     0.0  0       0
+#> 21   1          1     0.3  1       1
+#> n_sim_days: 14600
+#> b_stop_if_empty: 1
+#> b_stop_at_pop_size: 0
+#> maxt: 1825.00300661177
+#> driver_rate_per_cell_per_day: 0
+#> MAX_EVENTS= 29200 
+#> MAX_SIZE= 300003 
+#> No driver found: tries= 1 
+#>    val population fitness id driver1
+#> 1    0          1     0.0  0       0
+#> 2    1      99954     0.0  0       0
+#> 21   1          1     0.3  1       1
+#> n_sim_days: 14600
+#> b_stop_if_empty: 1
+#> b_stop_at_pop_size: 0
+#> maxt: 1825.00300661177
+#> driver_rate_per_cell_per_day: 0
+#> MAX_EVENTS= 29200 
+#> MAX_SIZE= 300003 
+#> No driver found: tries= 2 
+#>    val population fitness id driver1
+#> 1    0          1     0.0  0       0
+#> 2    1      99954     0.0  0       0
+#> 21   1          1     0.3  1       1
+#> n_sim_days: 14600
+#> b_stop_if_empty: 1
+#> b_stop_at_pop_size: 0
+#> maxt: 1825.00300661177
+#> driver_rate_per_cell_per_day: 0
+#> MAX_EVENTS= 29200 
+#> MAX_SIZE= 300003 
+#> No driver found: tries= 3 
+#>    val population fitness id driver1
+#> 1    0          1     0.0  0       0
+#> 2    1      99954     0.0  0       0
+#> 21   1          1     0.3  1       1
+#> n_sim_days: 14600
+#> b_stop_if_empty: 1
+#> b_stop_at_pop_size: 0
+#> maxt: 1825.00300661177
+#> driver_rate_per_cell_per_day: 0
+#> MAX_EVENTS= 29200 
+#> MAX_SIZE= 300003 
+#> No driver found: tries= 4 
+#>    val population fitness id driver1
+#> 1    0          1     0.0  0       0
+#> 2    1      99954     0.0  0       0
+#> 21   1          1     0.3  1       1
+#> n_sim_days: 14600
+#> b_stop_if_empty: 1
+#> b_stop_at_pop_size: 0
+#> maxt: 1825.00300661177
+#> driver_rate_per_cell_per_day: 0
+#> MAX_EVENTS= 29200 
+#> MAX_SIZE= 300003 
+#> No driver found: tries= 5 
+#>    val population fitness id driver1
+#> 1    0          1     0.0  0       0
+#> 2    1      99954     0.0  0       0
+#> 21   1          1     0.3  1       1
+#> n_sim_days: 14600
+#> b_stop_if_empty: 1
+#> b_stop_at_pop_size: 0
+#> maxt: 1825.00300661177
+#> driver_rate_per_cell_per_day: 0
+#> MAX_EVENTS= 29200 
+#> MAX_SIZE= 300003 
+#> No driver found: tries= 6 
+#>    val population fitness id driver1
+#> 1    0          1     0.0  0       0
+#> 2    1      99954     0.0  0       0
+#> 21   1          1     0.3  1       1
+#> n_sim_days: 14600
+#> b_stop_if_empty: 1
+#> b_stop_at_pop_size: 0
+#> maxt: 1825.00300661177
+#> driver_rate_per_cell_per_day: 0
+#> MAX_EVENTS= 29200 
+#> MAX_SIZE= 300003 
+#> No driver found: tries= 7 
+#>    val population fitness id driver1
+#> 1    0          1     0.0  0       0
+#> 2    1      99954     0.0  0       0
+#> 21   1          1     0.3  1       1
+#> n_sim_days: 14600
+#> b_stop_if_empty: 1
+#> b_stop_at_pop_size: 0
+#> maxt: 1825.00300661177
+#> driver_rate_per_cell_per_day: 0
+#> MAX_EVENTS= 29200 
 #> MAX_SIZE= 300003
-st=get_subsampled_tree(testing,30)
+st=get_subsampled_tree(selsim,30)
 #> Starting checking the validity of tmp...
 #> Found number of tips: n = 31 
 #> Found number of nodes: m = 30 
 #> Done.
-st=get_elapsed_time_tree(st,mutrateperdivision = 0,backgroundrate = 25/365,odf=1)
-plot_tree(st)
+st=get_elapsed_time_tree(st,mutrateperdivision = 0,backgroundrate = RATE/365,odf=1)
+st$agedf=get_agedf_from_sim(st)
+node=st$events$node[which(st$events$driverid==1)]
+res=fit_tree(tree=st,switch_nodes = node,xcross = c(),niter = 10000,model = "poisson_tree",early_growth_model_on = 0.0)
+#> Warning in fit_tree(tree = st, switch_nodes = node, xcross = c(), niter =
+#> 10000, : No sensitivity supplied: assuming 99%
+#> Median lambda estimate=15.20
+print(res$lambda)
+#> $mean
+#> lambda[1] lambda[2] 
+#>  15.05286  15.67520 
+#> 
+#> $sd
+#> lambda[1] lambda[2] 
+#> 0.1306224 0.5213855 
+#> 
+#> $lb
+#> lambda[1] lambda[2] 
+#>  14.79680  14.69335 
+#> 
+#> $ub
+#> lambda[1] lambda[2] 
+#>  15.30864  16.76342 
+#> 
+#> $median
+#> lambda[1] lambda[2] 
+#>  15.05287  15.65733
+ut=get_elapsed_time_tree(st)
+ut$edge.length=ut$edge.length/365
+plot_tree(ut,cex.label = 0);title("True Ultrametric Tree")
+#> 
+#> Phylogenetic tree with 31 tips and 30 internal nodes.
+#> 
+#> Tip labels:
+#>  s1, s2, s3, s4, s5, s6, ...
+#> 
+#> Rooted; includes branch lengths.
 ```
 
 <img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
 
-    #> 
-    #> Phylogenetic tree with 31 tips and 30 internal nodes.
-    #> 
-    #> Tip labels:
-    #>  s1, s2, s3, s4, s5, s6, ...
-    #> 
-    #> Rooted; includes branch lengths.
-    st$agedf=data.frame(tip.label=sprintf("s%d",1:31),age=c(1e-6,rep(5,30)))
-    res=fit_tree(tree=st,switch_nodes = c(),xcross = c(),niter = 10000,model = "poisson_tree",early_growth_model_on = 0.0)
-    #> Warning in fit_tree(tree = st, switch_nodes = c(), xcross = c(), niter =
-    #> 10000, : No sensitivity supplied: assuming 99%
-    #> Median lambda estimate=25.05
-    #> Error in new_CppObject_xp(fields$.module, fields$.pointer, ...) : 
-    #>   Exception: variable does not exist; processing stage=data initialization; variable name=alpha; base type=vector_d  (in 'model_poisson_tree' at line 106)
-    #> failed to create the sampler; sampling not done
-    #> Stan model 'poisson_tree' does not contain samples.
-    print(res$lambda)
-    #> $mean
-    #> NULL
-    #> 
-    #> $sd
-    #> NULL
-    #> 
-    #> $lb
-    #> NULL
-    #> 
-    #> $ub
-    #> NULL
-    #> 
-    #> $median
-    #> NULL
+``` r
+plot_tree(res$ultratree,cex.label = 0);title("Inferred Tree")
+#> 
+#> Phylogenetic tree with 31 tips and 30 internal nodes.
+#> 
+#> Tip labels:
+#>  s1, s2, s3, s4, s5, s6, ...
+#> 
+#> Rooted; includes branch lengths.
+```
+
+<img src="man/figures/README-unnamed-chunk-3-2.png" width="100%" />
