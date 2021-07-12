@@ -1,4 +1,4 @@
-09/07/2021
+12/07/2021
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -42,24 +42,24 @@ We assume that there are *p* − 1 change points in the tree corresponding t
 
 We assume the underlying mutation process follows a Negative Binomial Distribution with the above piecewise constant driver specific mutation rates, the number of mutations accrued on branch *i* in time *t*<sub>*i*</sub> measured in years:
 
-with priors $\\frac{1}{\\phi} \\sim \\text{HalfNormal}(0,10)$, $\\lambda \\sim \\mathcal{N}(\\hat{\\lambda},0.25 \\hat{\\lambda})$ where $\\hat{\\lambda}$ is the naive estimation of a single rate *λ* as the per patient median of the ratio of the root to tip mutation count and the tip sampling age, and finally we use the weakly informative prior for the stick breaking fractions:
-$$x\_i \\sim \\text{Beta}(\\alpha=\\frac{p\_i}{1-\\sum\_{j\\in A(i)}p\_j},\\beta=1)$$
- where the *p*<sub>*i*</sub> is an initial approximation of the duration of the branch length expressed as a fraction of the sampling time:
-$$p\_i=\\text{min}\_{j\\in D(i)}\\left\\{\\frac{m\_j+1}{\\sum\_{k\\in A(j)}\\left(m\_k+1\\right)}\\right\\}$$
+*M*<sub>*i*</sub> ∼ NB(*λ*×*t*<sub>*i*</sub>,*λ*×*t*<sub>*i*</sub>×*ϕ*)
+
+The number of observed mutations is:
+
+*m*<sub>*i*</sub> ∼ Binomial(*M*<sub>*i*</sub>, *s*<sub>*i*</sub>)
+
+Where we are using a per-branch estimated sensitivity *s*<sub>*i*</sub> that indirectly depends on the depth of sample and the number of samples sharing a branch (see ?). This is equivalent too:
+
+*m*<sub>*i*</sub> ∼ NB(*λ*×*t*<sub>*i*</sub>×*s*<sub>*i*</sub>,*λ*×*t*<sub>*i*</sub>×*ϕ*)
+
+with priors 1/*ϕ* ∼ HalfNormal(0, 10), *λ* ∼ 𝒩(*Λ*, 0.25*Λ*) where *Λ* is the naive estimation of a single rate *λ* as the per patient median of the ratio of the root to tip mutation count and the tip sampling age, and finally we use the weakly informative prior for the stick breaking fractions:
+
+*x*<sub>*i*</sub> ∼ Beta(*α* = *p*<sub>*i*</sub>/(1 − ∑<sub>*j* ∈ *A*(*i*)</sub>*p*<sub>*j*</sub>),*β* = 1)
+
+where the *p*<sub>*i*</sub> is an initial approximation of the duration of the branch length expressed as a fraction of the sampling time:
+*p*<sub>*i*</sub> = min<sub>*j* ∈ *D*(*i*)</sub>{(*m*<sub>*j*</sub>+1)/(∑<sub>*k* ∈ *A*(*j*)</sub>(*m*<sub>*k*</sub>+1))}
 
 Note that the overdispersion parameter is rescaled so that it is comparable across branches with different mutation burden.
-
-Note that we are using the following formulation of the Negative Binomial Distribution, which has the advantage that overdispersion parameter *ϕ* is invariant under binomial subsampling.
-
-$$ \\text{NB}(y \\, | \\, \\mu, \\phi)  = \\binom{y + \\phi - 1}{y} \\,
-\\left( \\frac{\\mu}{\\mu+\\phi} \\right)^{\\!y} \\, \\left(
-\\frac{\\phi}{\\mu+\\phi} \\right)^{\\!\\phi} $$
-
-and
-
-$$ \\mathbb{E}\[Y\] = \\mu \\ \\ \\
-\\text{ and } \\ \\ \\ \\text{Var}\[Y\] = \\mu + \\frac{\\mu^2}{\\phi}
-$$
 
 ### Poisson Model
 
@@ -69,7 +69,7 @@ Here we assume the underlying mutation process follows a Poisson Distribution ag
 
 where
 
-$$ S\_i \\sim \\text{Beta}(\\alpha=c,\\beta=c\\frac{1-s\_i}{s\_i})$$
+*S*<sub>*i*</sub> ∼ Beta(*α*=*c*,*β*=*c*(1−*s*<sub>*i*</sub>)/*s*<sub>*i*</sub>)
 
 Where we have chosen the concentration parameter *c* = 100. This reflects only modest uncertainty in our estimates in sensitivity and also allows the model to mitigate larger than expected variability in the branch lengths. In other respects the priors are the same as for the Negative Binomial Model.
 
@@ -102,7 +102,7 @@ testing=run_neutral_sim(0.1,1/365,nyears=NYEARS)
 #> n_sim_days: 9125
 #> b_stop_if_empty: 0
 #> b_stop_at_pop_size: 0
-#> maxt: 125.117544042763
+#> maxt: 126.526788456426
 #> driver_rate_per_cell_per_day: 0
 #> MAX_EVENTS= 18250 
 #> MAX_SIZE= 300003
@@ -129,22 +129,22 @@ plot_tree(st)
     res=fit_tree(tree=st,switch_nodes = c(),xcross = c(),niter = 10000,model = "poisson_tree",early_growth_model_on = 0.0)
     #> Warning in fit_tree(tree = st, switch_nodes = c(), xcross = c(), niter =
     #> 10000, : No sensitivity supplied: assuming 99%
-    #> Median lambda estimate=17.98
+    #> Median lambda estimate=18.26
     print(res$lambda)
     #> $mean
-    #> [1] 17.98793
+    #> [1] 18.47436
     #> 
     #> $sd
-    #> [1] 0.1716891
+    #> [1] 0.1717473
     #> 
     #> $lb
-    #> [1] 17.65346
+    #> [1] 18.14457
     #> 
     #> $ub
-    #> [1] 18.32885
+    #> [1] 18.81503
     #> 
     #> $median
-    #> [1] 17.9879
+    #> [1] 18.47352
     par(mfcol=c(1,2))
     ut=get_elapsed_time_tree(st)
     ut$edge.length=ut$edge.length/365
@@ -184,46 +184,178 @@ selsim=run_selection_sim(0.1,1/365,target_pop_size = 1e5,nyears_driver_acquisiti
 #> n_sim_days: 1825
 #> b_stop_if_empty: 0
 #> b_stop_at_pop_size: 0
-#> maxt: 118.691921919052
+#> maxt: 119.995052664879
 #> driver_rate_per_cell_per_day: 0
 #> MAX_EVENTS= 3650 
 #> MAX_SIZE= 300003 
 #> No driver found: tries= 0 
 #>    val population fitness id driver1
 #> 1    0          1     0.0  0       0
-#> 2    1      99983     0.0  0       0
+#> 2    1     100013     0.0  0       0
 #> 21   1          1     0.3  1       1
 #> n_sim_days: 14600
 #> b_stop_if_empty: 1
 #> b_stop_at_pop_size: 0
-#> maxt: 1825.00429587891
+#> maxt: 1825.00458255355
 #> driver_rate_per_cell_per_day: 0
 #> MAX_EVENTS= 29200 
-#> MAX_SIZE= 300003 
+#> MAX_SIZE= 300045 
 #> No driver found: tries= 1 
 #>    val population fitness id driver1
 #> 1    0          1     0.0  0       0
-#> 2    1      99983     0.0  0       0
+#> 2    1     100013     0.0  0       0
 #> 21   1          1     0.3  1       1
 #> n_sim_days: 14600
 #> b_stop_if_empty: 1
 #> b_stop_at_pop_size: 0
-#> maxt: 1825.00429587891
+#> maxt: 1825.00458255355
 #> driver_rate_per_cell_per_day: 0
 #> MAX_EVENTS= 29200 
-#> MAX_SIZE= 300003 
+#> MAX_SIZE= 300045 
 #> No driver found: tries= 2 
 #>    val population fitness id driver1
 #> 1    0          1     0.0  0       0
-#> 2    1      99983     0.0  0       0
+#> 2    1     100013     0.0  0       0
 #> 21   1          1     0.3  1       1
 #> n_sim_days: 14600
 #> b_stop_if_empty: 1
 #> b_stop_at_pop_size: 0
-#> maxt: 1825.00429587891
+#> maxt: 1825.00458255355
 #> driver_rate_per_cell_per_day: 0
 #> MAX_EVENTS= 29200 
-#> MAX_SIZE= 300003
+#> MAX_SIZE= 300045 
+#> No driver found: tries= 3 
+#>    val population fitness id driver1
+#> 1    0          1     0.0  0       0
+#> 2    1     100013     0.0  0       0
+#> 21   1          1     0.3  1       1
+#> n_sim_days: 14600
+#> b_stop_if_empty: 1
+#> b_stop_at_pop_size: 0
+#> maxt: 1825.00458255355
+#> driver_rate_per_cell_per_day: 0
+#> MAX_EVENTS= 29200 
+#> MAX_SIZE= 300045 
+#> No driver found: tries= 4 
+#>    val population fitness id driver1
+#> 1    0          1     0.0  0       0
+#> 2    1     100013     0.0  0       0
+#> 21   1          1     0.3  1       1
+#> n_sim_days: 14600
+#> b_stop_if_empty: 1
+#> b_stop_at_pop_size: 0
+#> maxt: 1825.00458255355
+#> driver_rate_per_cell_per_day: 0
+#> MAX_EVENTS= 29200 
+#> MAX_SIZE= 300045 
+#> No driver found: tries= 5 
+#>    val population fitness id driver1
+#> 1    0          1     0.0  0       0
+#> 2    1     100013     0.0  0       0
+#> 21   1          1     0.3  1       1
+#> n_sim_days: 14600
+#> b_stop_if_empty: 1
+#> b_stop_at_pop_size: 0
+#> maxt: 1825.00458255355
+#> driver_rate_per_cell_per_day: 0
+#> MAX_EVENTS= 29200 
+#> MAX_SIZE= 300045 
+#> No driver found: tries= 6 
+#>    val population fitness id driver1
+#> 1    0          1     0.0  0       0
+#> 2    1     100013     0.0  0       0
+#> 21   1          1     0.3  1       1
+#> n_sim_days: 14600
+#> b_stop_if_empty: 1
+#> b_stop_at_pop_size: 0
+#> maxt: 1825.00458255355
+#> driver_rate_per_cell_per_day: 0
+#> MAX_EVENTS= 29200 
+#> MAX_SIZE= 300045 
+#> No driver found: tries= 7 
+#>    val population fitness id driver1
+#> 1    0          1     0.0  0       0
+#> 2    1     100013     0.0  0       0
+#> 21   1          1     0.3  1       1
+#> n_sim_days: 14600
+#> b_stop_if_empty: 1
+#> b_stop_at_pop_size: 0
+#> maxt: 1825.00458255355
+#> driver_rate_per_cell_per_day: 0
+#> MAX_EVENTS= 29200 
+#> MAX_SIZE= 300045 
+#> No driver found: tries= 8 
+#>    val population fitness id driver1
+#> 1    0          1     0.0  0       0
+#> 2    1     100013     0.0  0       0
+#> 21   1          1     0.3  1       1
+#> n_sim_days: 14600
+#> b_stop_if_empty: 1
+#> b_stop_at_pop_size: 0
+#> maxt: 1825.00458255355
+#> driver_rate_per_cell_per_day: 0
+#> MAX_EVENTS= 29200 
+#> MAX_SIZE= 300045 
+#> No driver found: tries= 9 
+#>    val population fitness id driver1
+#> 1    0          1     0.0  0       0
+#> 2    1     100013     0.0  0       0
+#> 21   1          1     0.3  1       1
+#> n_sim_days: 14600
+#> b_stop_if_empty: 1
+#> b_stop_at_pop_size: 0
+#> maxt: 1825.00458255355
+#> driver_rate_per_cell_per_day: 0
+#> MAX_EVENTS= 29200 
+#> MAX_SIZE= 300045 
+#> No driver found: tries= 10 
+#>    val population fitness id driver1
+#> 1    0          1     0.0  0       0
+#> 2    1     100013     0.0  0       0
+#> 21   1          1     0.3  1       1
+#> n_sim_days: 14600
+#> b_stop_if_empty: 1
+#> b_stop_at_pop_size: 0
+#> maxt: 1825.00458255355
+#> driver_rate_per_cell_per_day: 0
+#> MAX_EVENTS= 29200 
+#> MAX_SIZE= 300045 
+#> No driver found: tries= 11 
+#>    val population fitness id driver1
+#> 1    0          1     0.0  0       0
+#> 2    1     100013     0.0  0       0
+#> 21   1          1     0.3  1       1
+#> n_sim_days: 14600
+#> b_stop_if_empty: 1
+#> b_stop_at_pop_size: 0
+#> maxt: 1825.00458255355
+#> driver_rate_per_cell_per_day: 0
+#> MAX_EVENTS= 29200 
+#> MAX_SIZE= 300045 
+#> No driver found: tries= 12 
+#>    val population fitness id driver1
+#> 1    0          1     0.0  0       0
+#> 2    1     100013     0.0  0       0
+#> 21   1          1     0.3  1       1
+#> n_sim_days: 14600
+#> b_stop_if_empty: 1
+#> b_stop_at_pop_size: 0
+#> maxt: 1825.00458255355
+#> driver_rate_per_cell_per_day: 0
+#> MAX_EVENTS= 29200 
+#> MAX_SIZE= 300045 
+#> No driver found: tries= 13 
+#>    val population fitness id driver1
+#> 1    0          1     0.0  0       0
+#> 2    1     100013     0.0  0       0
+#> 21   1          1     0.3  1       1
+#> n_sim_days: 14600
+#> b_stop_if_empty: 1
+#> b_stop_at_pop_size: 0
+#> maxt: 1825.00458255355
+#> driver_rate_per_cell_per_day: 0
+#> MAX_EVENTS= 29200 
+#> MAX_SIZE= 300045
 st=get_subsampled_tree(selsim,30)
 #> Starting checking the validity of tmp...
 #> Found number of tips: n = 31 
@@ -235,27 +367,27 @@ node=st$events$node[which(st$events$driverid==1)]
 res=fit_tree(tree=st,switch_nodes = node,xcross = c(),niter = 10000,model = "poisson_tree",early_growth_model_on = 0.0)
 #> Warning in fit_tree(tree = st, switch_nodes = node, xcross = c(), niter =
 #> 10000, : No sensitivity supplied: assuming 99%
-#> Median lambda estimate=15.08
+#> Median lambda estimate=15.35
 print(res$lambda)
 #> $mean
 #> lambda[1] lambda[2] 
-#>  15.21543  15.45877 
+#>  15.19638  15.53600 
 #> 
 #> $sd
 #> lambda[1] lambda[2] 
-#> 0.1344419 0.4686187 
+#> 0.1512746 0.4381389 
 #> 
 #> $lb
 #> lambda[1] lambda[2] 
-#>  14.95337  14.57197 
+#>  14.89935  14.71521 
 #> 
 #> $ub
 #> lambda[1] lambda[2] 
-#>  15.48257  16.40324 
+#>  15.49802  16.43364 
 #> 
 #> $median
 #> lambda[1] lambda[2] 
-#>  15.21507  15.44559
+#>  15.19590  15.52333
 ut=get_elapsed_time_tree(st)
 ut$edge.length=ut$edge.length/365
 par(mfcol=c(1,2))

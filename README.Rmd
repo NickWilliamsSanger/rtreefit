@@ -62,7 +62,7 @@ We assume that there are $p-1$ change points in the tree corresponding to the ac
 
 We assume the underlying mutation process follows a Negative Binomial Distribution with the above piecewise constant driver specific mutation rates, the number of mutations accrued on branch $i$ in time $t_i$ measured in years:
 
-\[ M_i \sim \text{NB}(\lambda t_i,\lambda t_i \phi) \]
+\[ M_i \sim \text{NB}\left(\lambda\times t_i,\lambda\times t_i\times \phi\right) \]
 
 The number of observed mutations is:
 
@@ -70,26 +70,16 @@ The number of observed mutations is:
 
 Where we are using a per-branch estimated sensitivity $s_i$ that indirectly depends  on the depth of sample and the number of samples sharing a branch (see ?).  This is equivalent too:
 
-\[ m_i \sim \text{NB}(\lambda t_i s_i,\lambda t_i \phi) \]
+\[ m_i \sim \text{NB}\left(\lambda\times t_i \times s_i,\lambda\times t_i\times \phi\right) \]
 
-with priors $\frac{1}{\phi} \sim \text{HalfNormal}(0,10)$, $\lambda \sim \mathcal{N}(\hat{\lambda},0.25 \hat{\lambda}$ where $\hat{\lambda}$ is the naive estimation of a single rate $\lambda$ as the per patient median of the ratio of the root to tip mutation count and the tip sampling age, and finally we use the weakly informative prior for the stick breaking fractions:
-\[x_i \sim \text{Beta}(\alpha=\frac{p_i}{1-\sum_{j\in A(i)}p_j},\beta=1)\]
+with priors $1/\phi \sim \text{HalfNormal}(0,10)$, $\lambda \sim \mathcal{N}(\Lambda,0.25 \Lambda)$ where $\Lambda$ is the naive estimation of a single rate $\lambda$ as the per patient median of the ratio of the root to tip mutation count and the tip sampling age, and finally we use the weakly informative prior for the stick breaking fractions:
+
+\[x_i \sim \text{Beta}(\alpha=p_i/(1-\sum_{j\in A(i)}p_j),\beta=1)\]
+
 where the $p_i$ is an initial approximation of the duration of the branch length expressed as a fraction of the sampling time:
-\[p_i=\text{min}_{j\in D(i)}\left\{\frac{m_j+1}{\sum_{k\in A(j)}\left(m_k+1\right)}\right\}\]
+\[p_i=\text{min}_{j\in D(i)}\left\{(m_j+1)/(\sum_{k\in A(j)}\left(m_k+1\right))\right\}\]
 
 Note that the overdispersion parameter is rescaled so that it is comparable across branches with different mutation burden.
-
-Note that we are using the following formulation of the Negative Binomial Distribution, which has the advantage that overdispersion parameter $\phi$ is invariant under binomial subsampling.
-
-\[ \text{NB}(y \, | \, \mu, \phi)  = \binom{y + \phi - 1}{y} \,
-\left( \frac{\mu}{\mu+\phi} \right)^{\!y} \, \left(
-\frac{\phi}{\mu+\phi} \right)^{\!\phi} \]
-
-and
-
-\[ \mathbb{E}[Y] = \mu \ \ \
-\text{ and } \ \ \ \text{Var}[Y] = \mu + \frac{\mu^2}{\phi}
-\]
 
 
 ### Poisson Model
@@ -99,10 +89,9 @@ Here we assume the underlying mutation process follows a Poisson Distribution ag
 
 where
 
-\[ S_i \sim \text{Beta}(\alpha=c,\beta=c\frac{1-s_i}{s_i})\]
+\[ S_i \sim \text{Beta}\left(\alpha=c,\beta=c(1-s_i)/s_i\right)\]
 
 Where we have chosen the concentration parameter $c=100$. This reflects only modest uncertainty in our estimates in sensitivity and also allows the model to mitigate larger than expected variability in the branch lengths. In other respects the priors are the same as for the Negative Binomial Model.
-
 
 ### Examples
 
@@ -153,5 +142,6 @@ par(mfcol=c(1,2))
 plot_tree(ut,cex.label = 0);title("True Ultrametric Tree")
 plot_tree(res$ultratree,cex.label = 0);title("Inferred Tree")
 ```
+
 
 
