@@ -42,16 +42,6 @@ We assume that there are *p* − 1 change points in the tree corresponding t
 
 We assume the underlying mutation process follows a Negative Binomial Distribution with the above piecewise constant driver specific mutation rates, the number of mutations accrued on branch *i* in time *t*<sub>*i*</sub> measured in years:
 
-*M*<sub>*i*</sub> ∼ NB(*λ**t*<sub>*i*</sub>, *λ**t*<sub>*i*</sub>*ϕ*)
-
-The number of observed mutations is:
-
-*m*<sub>*i*</sub> ∼ Binomial(*M*<sub>*i*</sub>, *s*<sub>*i*</sub>)
-
-Where we are using a per-branch estimated sensitivity *s*<sub>*i*</sub> that indirectly depends on the depth of sample and the number of samples sharing a branch (see ?). This is equivalent too:
-
-*m*<sub>*i*</sub> ∼ NB(*λ**t*<sub>*i*</sub>*s*<sub>*i*</sub>, *λ**t*<sub>*i*</sub>*ϕ*)
-
 with priors $\\frac{1}{\\phi} \\sim \\text{HalfNormal}(0,10)$, $\\lambda \\sim \\mathcal{N}(\\hat{\\lambda},0.25 \\hat{\\lambda})$ where $\\hat{\\lambda}$ is the naive estimation of a single rate *λ* as the per patient median of the ratio of the root to tip mutation count and the tip sampling age, and finally we use the weakly informative prior for the stick breaking fractions:
 $$x\_i \\sim \\text{Beta}(\\alpha=\\frac{p\_i}{1-\\sum\_{j\\in A(i)}p\_j},\\beta=1)$$
  where the *p*<sub>*i*</sub> is an initial approximation of the duration of the branch length expressed as a fraction of the sampling time:
@@ -112,7 +102,7 @@ testing=run_neutral_sim(0.1,1/365,nyears=NYEARS)
 #> n_sim_days: 9125
 #> b_stop_if_empty: 0
 #> b_stop_at_pop_size: 0
-#> maxt: 133.186269064628
+#> maxt: 125.117544042763
 #> driver_rate_per_cell_per_day: 0
 #> MAX_EVENTS= 18250 
 #> MAX_SIZE= 300003
@@ -139,22 +129,22 @@ plot_tree(st)
     res=fit_tree(tree=st,switch_nodes = c(),xcross = c(),niter = 10000,model = "poisson_tree",early_growth_model_on = 0.0)
     #> Warning in fit_tree(tree = st, switch_nodes = c(), xcross = c(), niter =
     #> 10000, : No sensitivity supplied: assuming 99%
-    #> Median lambda estimate=18.30
+    #> Median lambda estimate=17.98
     print(res$lambda)
     #> $mean
-    #> [1] 18.37559
+    #> [1] 17.98793
     #> 
     #> $sd
-    #> [1] 0.1715528
+    #> [1] 0.1716891
     #> 
     #> $lb
-    #> [1] 18.04111
+    #> [1] 17.65346
     #> 
     #> $ub
-    #> [1] 18.72024
+    #> [1] 18.32885
     #> 
     #> $median
-    #> [1] 18.37409
+    #> [1] 17.9879
     par(mfcol=c(1,2))
     ut=get_elapsed_time_tree(st)
     ut$edge.length=ut$edge.length/365
@@ -194,19 +184,43 @@ selsim=run_selection_sim(0.1,1/365,target_pop_size = 1e5,nyears_driver_acquisiti
 #> n_sim_days: 1825
 #> b_stop_if_empty: 0
 #> b_stop_at_pop_size: 0
-#> maxt: 109.958137588241
+#> maxt: 118.691921919052
 #> driver_rate_per_cell_per_day: 0
 #> MAX_EVENTS= 3650 
 #> MAX_SIZE= 300003 
 #> No driver found: tries= 0 
 #>    val population fitness id driver1
 #> 1    0          1     0.0  0       0
-#> 2    1      99976     0.0  0       0
+#> 2    1      99983     0.0  0       0
 #> 21   1          1     0.3  1       1
 #> n_sim_days: 14600
 #> b_stop_if_empty: 1
 #> b_stop_at_pop_size: 0
-#> maxt: 1825.00193260129
+#> maxt: 1825.00429587891
+#> driver_rate_per_cell_per_day: 0
+#> MAX_EVENTS= 29200 
+#> MAX_SIZE= 300003 
+#> No driver found: tries= 1 
+#>    val population fitness id driver1
+#> 1    0          1     0.0  0       0
+#> 2    1      99983     0.0  0       0
+#> 21   1          1     0.3  1       1
+#> n_sim_days: 14600
+#> b_stop_if_empty: 1
+#> b_stop_at_pop_size: 0
+#> maxt: 1825.00429587891
+#> driver_rate_per_cell_per_day: 0
+#> MAX_EVENTS= 29200 
+#> MAX_SIZE= 300003 
+#> No driver found: tries= 2 
+#>    val population fitness id driver1
+#> 1    0          1     0.0  0       0
+#> 2    1      99983     0.0  0       0
+#> 21   1          1     0.3  1       1
+#> n_sim_days: 14600
+#> b_stop_if_empty: 1
+#> b_stop_at_pop_size: 0
+#> maxt: 1825.00429587891
 #> driver_rate_per_cell_per_day: 0
 #> MAX_EVENTS= 29200 
 #> MAX_SIZE= 300003
@@ -221,27 +235,27 @@ node=st$events$node[which(st$events$driverid==1)]
 res=fit_tree(tree=st,switch_nodes = node,xcross = c(),niter = 10000,model = "poisson_tree",early_growth_model_on = 0.0)
 #> Warning in fit_tree(tree = st, switch_nodes = node, xcross = c(), niter =
 #> 10000, : No sensitivity supplied: assuming 99%
-#> Median lambda estimate=15.10
+#> Median lambda estimate=15.08
 print(res$lambda)
 #> $mean
 #> lambda[1] lambda[2] 
-#>  15.23813  15.04098 
+#>  15.21543  15.45877 
 #> 
 #> $sd
 #> lambda[1] lambda[2] 
-#> 0.1374329 0.4578260 
+#> 0.1344419 0.4686187 
 #> 
 #> $lb
 #> lambda[1] lambda[2] 
-#>  14.97016  14.17920 
+#>  14.95337  14.57197 
 #> 
 #> $ub
 #> lambda[1] lambda[2] 
-#>  15.50640  15.95628 
+#>  15.48257  16.40324 
 #> 
 #> $median
 #> lambda[1] lambda[2] 
-#>  15.23717  15.02817
+#>  15.21507  15.44559
 ut=get_elapsed_time_tree(st)
 ut$edge.length=ut$edge.length/365
 par(mfcol=c(1,2))
