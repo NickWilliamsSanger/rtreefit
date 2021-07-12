@@ -85,7 +85,7 @@ Note that the overdispersion parameter is rescaled so that it is comparable acro
 ### Poisson Model
 Here we assume the underlying mutation process follows a Poisson Distribution again with the above piecewise constant driver specific mutation rates, the number of observed mutations accrued on branch $i$ in time $t_i$ measured in years:
 
-\[ m_i \sim \text{Poisson}(\lambda t_i S_i) \]
+\[ m_i \sim \text{Poisson}(\lambda\times t_i\times S_i) \]
 
 where
 
