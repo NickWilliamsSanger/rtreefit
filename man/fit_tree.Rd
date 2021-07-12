@@ -28,6 +28,8 @@ fit_tree(
 
 \item{niter}{Number of iterations per chain in stan inference}
 
+\item{cores}{Number of cores (and chains) to use in the stan inference.}
+
 \item{model}{nb_tree or poisson_tree}
 
 \item{early_growth_model_on}{Numeric. Scaling for early growth model.  If 0 then the model is switched off.}
@@ -35,7 +37,25 @@ fit_tree(
 \item{stan_control}{List. Control list to be passed into rstan::sampling.}
 }
 \value{
-A list
+A list with elements:
+
+fullres :full stan results,
+
+lambda : Estimates of wild-type and per switch node mutation rate (in parallel with c("WT",switch_nodes))
+
+k : For NB model overdispersion paramater variance=mean(1+k))
+
+ultratree : Tree with inferred branch lengths in units of time (phylo)
+
+intree : Input tree (phylo)
+
+dat : List input data for inference
+
+upper_node_lims : List with summary timing statistics of end of branch in parallel with switch_nodes
+
+lower_node_lims : List with summary timing statistics of start of branch in parallel with switch_nodes
+
+split_nodes : Input split nodes
 }
 \description{
 Fit tree to infer branch timings and mutation rate based on observed mutation count and sensitivity
