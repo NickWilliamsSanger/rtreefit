@@ -32,7 +32,7 @@ vignette: >
 You can install rtreefit like so:
 
 ``` r
-devtools::install_github("NickWilliamsSanger/rsimpop")
+devtools::install_github("NickWilliamsSanger/rtreefit",build_vignettes=TRUE)
 ```
 
 ```{r setup, include=FALSE}
@@ -46,7 +46,11 @@ This package estimates time-based (“ultrametric”) trees, wherein the y-axis 
 
 Mean = Duration × Sensitivity × Mutation Rate
 
-The method works with at most one change point per branch and supports heterochronous sampling.  See the main vignette for fuller mathematical details ( browseVignettes("rtreefit") )
+The method works with at most one change point per branch and supports heterochronous sampling.  See the rtreefit vignette for slightly fuller mathematical details:
+
+``` r
+browseVignettes("rtreefit") 
+```
 
 ## Branch Timings and Per Driver Clade Mutation Rate
 

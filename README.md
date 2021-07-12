@@ -8,7 +8,7 @@ Installation
 You can install rtreefit like so:
 
 ``` r
-devtools::install_github("NickWilliamsSanger/rsimpop")
+devtools::install_github("NickWilliamsSanger/rtreefit",build_vignettes=TRUE)
 ```
 
 Introduction
@@ -18,7 +18,11 @@ This package estimates time-based (“ultrametric”) trees, wherein the y-axis 
 
 Mean = Duration × Sensitivity × Mutation Rate
 
-The method works with at most one change point per branch and supports heterochronous sampling. See the main vignette for fuller mathematical details ( browseVignettes("rtreefit") )
+The method works with at most one change point per branch and supports heterochronous sampling. See the rtreefit vignette for slightly fuller mathematical details:
+
+``` r
+browseVignettes("rtreefit") 
+```
 
 Branch Timings and Per Driver Clade Mutation Rate
 -------------------------------------------------
@@ -109,7 +113,7 @@ testing=run_neutral_sim(0.1,1/365,nyears=NYEARS)
 #> n_sim_days: 9125
 #> b_stop_if_empty: 0
 #> b_stop_at_pop_size: 0
-#> maxt: 118.612632794685
+#> maxt: 114.76592783799
 #> driver_rate_per_cell_per_day: 0
 #> MAX_EVENTS= 18250 
 #> MAX_SIZE= 300003
@@ -136,22 +140,22 @@ plot_tree(st)
     res=fit_tree(tree=st,switch_nodes = c(),xcross = c(),niter = 10000,model = "poisson_tree",early_growth_model_on = 0.0)
     #> Warning in fit_tree(tree = st, switch_nodes = c(), xcross = c(), niter =
     #> 10000, : No sensitivity supplied: assuming 99%
-    #> Median lambda estimate=18.14
+    #> Median lambda estimate=18.10
     print(res$lambda)
     #> $mean
-    #> [1] 18.24557
+    #> [1] 18.08432
     #> 
     #> $sd
-    #> [1] 0.1630789
+    #> [1] 0.1722527
     #> 
     #> $lb
-    #> [1] 17.9273
+    #> [1] 17.75389
     #> 
     #> $ub
-    #> [1] 18.56871
+    #> [1] 18.42925
     #> 
     #> $median
-    #> [1] 18.24565
+    #> [1] 18.08249
     par(mfcol=c(1,2))
     ut=get_elapsed_time_tree(st)
     ut$edge.length=ut$edge.length/365
@@ -191,46 +195,46 @@ selsim=run_selection_sim(0.1,1/365,target_pop_size = 1e5,nyears_driver_acquisiti
 #> n_sim_days: 1825
 #> b_stop_if_empty: 0
 #> b_stop_at_pop_size: 0
-#> maxt: 118.413550167523
+#> maxt: 116.727721368761
 #> driver_rate_per_cell_per_day: 0
 #> MAX_EVENTS= 3650 
 #> MAX_SIZE= 300003 
 #> No driver found: tries= 0 
 #>    val population fitness id driver1
 #> 1    0          1     0.0  0       0
-#> 2    1     100029     0.0  0       0
+#> 2    1     100027     0.0  0       0
 #> 21   1          1     0.3  1       1
 #> n_sim_days: 14600
 #> b_stop_if_empty: 1
 #> b_stop_at_pop_size: 0
-#> maxt: 1825.00427805509
+#> maxt: 1825.00040223652
 #> driver_rate_per_cell_per_day: 0
 #> MAX_EVENTS= 29200 
-#> MAX_SIZE= 300093 
+#> MAX_SIZE= 300087 
 #> No driver found: tries= 1 
 #>    val population fitness id driver1
 #> 1    0          1     0.0  0       0
-#> 2    1     100029     0.0  0       0
+#> 2    1     100027     0.0  0       0
 #> 21   1          1     0.3  1       1
 #> n_sim_days: 14600
 #> b_stop_if_empty: 1
 #> b_stop_at_pop_size: 0
-#> maxt: 1825.00427805509
+#> maxt: 1825.00040223652
 #> driver_rate_per_cell_per_day: 0
 #> MAX_EVENTS= 29200 
-#> MAX_SIZE= 300093 
+#> MAX_SIZE= 300087 
 #> No driver found: tries= 2 
 #>    val population fitness id driver1
 #> 1    0          1     0.0  0       0
-#> 2    1     100029     0.0  0       0
+#> 2    1     100027     0.0  0       0
 #> 21   1          1     0.3  1       1
 #> n_sim_days: 14600
 #> b_stop_if_empty: 1
 #> b_stop_at_pop_size: 0
-#> maxt: 1825.00427805509
+#> maxt: 1825.00040223652
 #> driver_rate_per_cell_per_day: 0
 #> MAX_EVENTS= 29200 
-#> MAX_SIZE= 300093
+#> MAX_SIZE= 300087
 st=get_subsampled_tree(selsim,30)
 #> Starting checking the validity of tmp...
 #> Found number of tips: n = 31 
@@ -242,27 +246,27 @@ node=st$events$node[which(st$events$driverid==1)]
 res=fit_tree(tree=st,switch_nodes = node,xcross = c(),niter = 10000,model = "poisson_tree",early_growth_model_on = 0.0)
 #> Warning in fit_tree(tree = st, switch_nodes = node, xcross = c(), niter =
 #> 10000, : No sensitivity supplied: assuming 99%
-#> Median lambda estimate=15.56
+#> Median lambda estimate=15.38
 print(res$lambda)
 #> $mean
 #> lambda[1] lambda[2] 
-#>  15.19925  15.59161 
+#>  15.44703  15.21443 
 #> 
 #> $sd
 #> lambda[1] lambda[2] 
-#> 0.3705155 0.3352055 
+#> 0.1891049 0.3896968 
 #> 
 #> $lb
 #> lambda[1] lambda[2] 
-#>  14.48251  14.96477 
+#>  15.07746  14.47648 
 #> 
 #> $ub
 #> lambda[1] lambda[2] 
-#>  15.93071  16.28089 
+#>  15.82462  16.02395 
 #> 
 #> $median
 #> lambda[1] lambda[2] 
-#>  15.19759  15.58145
+#>  15.44616  15.20701
 ut=get_elapsed_time_tree(st)
 ut$edge.length=ut$edge.length/365
 par(mfcol=c(1,2))
