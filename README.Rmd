@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 ---
   date: `r format(Sys.Date(), "%d/%m/%Y")`
 ---
-  ---
+---
   title: "Introduction to rtreefit"
 output: rmarkdown::html_vignette
 description: >
@@ -27,10 +27,26 @@ vignette: >
 \usepackage[utf8]{inputenc}
 ---
 
-  ```{r setup, include=FALSE}
+## Installation
+
+You can install rtreefit like so:
+
+``` r
+devtools::install_github("NickWilliamsSanger/rsimpop")
+```
+
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library("rtreefit")
 ```
+
+## Introduction
+
+This package estimates time-based (“ultrametric”) trees, wherein the y-axis of phylogenetic somatic mutation trees is converted from mutations to time. The method jointly fits wild type rates, mutant rates and absolute time branch lengths using a Bayesian per individual tree-based model under the assumption that the observed branch lengths are Poisson or Negative Binomial distributed with 
+
+Mean = Duration × Sensitivity × Mutation Rate
+
+The method works with at most one change point per branch and supports heterochronous sampling.  See the main vignette for fuller mathematical details ( browseVignettes("rtreefit") )
 
 ## Branch Timings and Per Driver Clade Mutation Rate
 
@@ -92,6 +108,7 @@ where
 \[ S_i \sim \text{Beta}\left(\alpha=c,\beta=c(1-s_i)/s_i\right)\]
 
 Where we have chosen the concentration parameter $c=100$. This reflects only modest uncertainty in our estimates in sensitivity and also allows the model to mitigate larger than expected variability in the branch lengths. In other respects the priors are the same as for the Negative Binomial Model.
+
 
 ### Examples
 

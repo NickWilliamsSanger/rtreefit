@@ -7,7 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "nw14@sanger.ac.uk",
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: Estimates branch lengths using observed mutation burden and per branch sensitivities. Constrained so that the root to tip distance is the specified age at sampling of the tips.
+Description: Estimates branch lengths of phylogenetic somatic mutation trees using observed mutation burden and per branch sensitivities. Constrained so that the root to tip distance is the specified age at sampling of the tips.
 License: GPL3
 Encoding: UTF-8
 LazyData: true
