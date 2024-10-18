@@ -1,4 +1,7 @@
-12/07/2021
+# This version is no longer supported
+
+Please use https://github.com/nangalialab/rtreefit
+
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
